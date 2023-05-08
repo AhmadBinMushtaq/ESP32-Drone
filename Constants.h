@@ -4,14 +4,15 @@
 // average flight time is 13 minutes with 10x5 props, 3000 mAh 3S lipo battery
 
 //----------- PINS -----------
-#define FRONT_LEFT_MOTOR_PIN 5
-#define FRONT_RIGHT_MOTOR_PIN 6
-#define REAR_LEFT_MOTOR_PIN 11
-#define REAR_RIGHT_MOTOR_PIN 10
-#define LED_PIN 12
-#define BUZZER_PIN 8
-#define IMU_INTERRUPT_PIN 3
-#define RX_INTERRUPT_PIN 2
+#define FRONT_LEFT_MOTOR_PIN 13
+#define FRONT_RIGHT_MOTOR_PIN 12
+#define REAR_LEFT_MOTOR_PIN 14
+#define REAR_RIGHT_MOTOR_PIN 27
+#define LED_PIN 4
+#define BUZZER_PIN 15
+#define IMU_INTERRUPT_PIN 19
+#define IMU_LED_PIN 2
+#define RX_INTERRUPT_PIN 33
 
 //----------- IMU CALIBRATION -----------
 #define ACCEL_OFFSET_X 90

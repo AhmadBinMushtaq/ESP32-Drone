@@ -6,10 +6,7 @@
 void initializeOutputSignals() {
   pinMode(LED_PIN, OUTPUT);
   pinMode(BUZZER_PIN, OUTPUT);
-  pinMode(A1, OUTPUT);
-  digitalWrite(A1, LOW);
   digitalWrite(LED_PIN, LOW);
-  noTone(BUZZER_PIN);
 }
 
 void syncOutputSignals() {
@@ -18,12 +15,7 @@ void syncOutputSignals() {
 
 void quadcopter_initialization_completed() {
   blink_led();
-  taskManager.execute([] {
-    tone(BUZZER_PIN, 2000);
-    taskManager.scheduleOnce(1000, [] {
-      noTone(BUZZER_PIN);
-    });
-  });
+  
 }
 
 bool ledIsOn = false;
@@ -42,18 +34,7 @@ void blink_led() {
 
 void quadcopter_armed() {
   blink_led();
-  taskManager.execute([] {
-    tone(BUZZER_PIN, 200);
-    taskManager.scheduleOnce(500, [] {
-      tone(BUZZER_PIN, 1000);
-      taskManager.scheduleOnce(500, [] {
-        tone(BUZZER_PIN, 300);
-        taskManager.scheduleOnce(500, [] {
-          noTone(BUZZER_PIN);
-        });
-      });
-    });
-  });
+  
 }
 
 void quadcopter_disarmed() {
@@ -61,15 +42,6 @@ void quadcopter_disarmed() {
   
   taskManager.execute([] {
     digitalWrite(LED_PIN, HIGH);
-    tone(BUZZER_PIN, 3000);
-    taskManager.scheduleOnce(500, [] {
-      tone(BUZZER_PIN, 1000);
-      taskManager.scheduleOnce(500, [] {
-        tone(BUZZER_PIN, 200);
-        taskManager.scheduleOnce(500, [] {
-          noTone(BUZZER_PIN);
-        });
-      });
-    });
+    
   });
 }

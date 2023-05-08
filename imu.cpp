@@ -72,7 +72,7 @@ void initializeIMU() {
     }
 
     // configure LED for output
-    pinMode(LED_BUILTIN, OUTPUT);
+    pinMode(IMU_LED_PIN, OUTPUT);
 }
 
 struct IMU_Values GetIMUvalues() {
@@ -105,7 +105,7 @@ struct IMU_Values GetIMUvalues() {
 
     // blink LED to indicate activity
     blinkState = !blinkState;
-    digitalWrite(LED_BUILTIN, blinkState);
+    digitalWrite(IMU_LED_PIN, blinkState);
 
     previousOrientation = o.CurrentOrientation;
     if (last_time == 0) {

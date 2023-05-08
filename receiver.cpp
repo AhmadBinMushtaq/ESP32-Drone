@@ -8,13 +8,17 @@ bool armed = false;
 
 volatile unsigned long receiver_last_communication_time = millis();
 volatile unsigned long pulse_start = 0;
-volatile byte current_channel = 0;
+volatile int current_channel = 0;
 
 void initializeReceiver() {
+  pinMode(RX_INTERRUPT_PIN, INPUT_PULLDOWN);
   attachInterrupt(digitalPinToInterrupt(RX_INTERRUPT_PIN), handle_interrupt, CHANGE);
 }
 
-void handle_interrupt() {
+//Interrupt functions
+
+// Flysky reciever Channel 1 interrupt
+void IRAM_ATTR handle_interrupt() {
 
   if(millis()-receiver_last_communication_time < RECEIVER_COMMUNICATION_TIMEOUT_IN_MILLISECONDS){
     receiverRawValues.TransmitterCommunicationFailure = false;
@@ -45,7 +49,6 @@ void handle_interrupt() {
     current_channel++;
     pulse_start = micros();
 
-  
 }
 
 struct ReceiverCommands GetReceiverCommands() {
@@ -56,12 +59,10 @@ struct ReceiverCommands GetReceiverCommands() {
     return getFailureReceiverCommand();
     }
     struct ReceiverCommands cmd;
-//    cmd.RollAngle = map_double(constrain(receiverRawValues.ChannelValues[0], TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE), TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE, -QUADCOPTER_MAX_TILT_ANGLE, QUADCOPTER_MAX_TILT_ANGLE);
-    cmd.RollAngle = 0;
+    cmd.RollAngle = map_double(constrain(receiverRawValues.ChannelValues[0], TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE), TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE, -QUADCOPTER_MAX_TILT_ANGLE, QUADCOPTER_MAX_TILT_ANGLE);
     cmd.PitchAngle = map_double(constrain(receiverRawValues.ChannelValues[1], TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE), TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE, -QUADCOPTER_MAX_TILT_ANGLE, QUADCOPTER_MAX_TILT_ANGLE);
     cmd.Throttle = map_double(constrain(receiverRawValues.ChannelValues[2], TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE), TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE, 0, THROTTLE_LIMIT_POINT);
-//    cmd.YawAngleChange = map_double(constrain(receiverRawValues.ChannelValues[3], TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE), TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE, -QUADCOPTER_MAX_YAW_ANGLE_CHANGE_PER_SECOND, QUADCOPTER_MAX_YAW_ANGLE_CHANGE_PER_SECOND);
-    cmd.YawAngleChange = 0;
+    cmd.YawAngleChange = map_double(constrain(receiverRawValues.ChannelValues[3], TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE), TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE, -QUADCOPTER_MAX_YAW_ANGLE_CHANGE_PER_SECOND, QUADCOPTER_MAX_YAW_ANGLE_CHANGE_PER_SECOND);
     cmd.Aux_1 = map(constrain(receiverRawValues.ChannelValues[4], TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE), TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE, 0, 100);
     cmd.Aux_2 = map(constrain(receiverRawValues.ChannelValues[5], TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE), TRANSMITTER_JOYSTICK_MIN_VALUE, TRANSMITTER_JOYSTICK_MAX_VALUE, 0, 100);
     cmd.Armed = getArmStatus();
