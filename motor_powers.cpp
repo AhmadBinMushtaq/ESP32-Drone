@@ -11,23 +11,27 @@ struct ConstantsPID pid;
 
 //----------- PID CONTROL LIMITS-----------
 double ROLL_PITCH_CONTROL_SIGNAL_LIMIT = pid.KP_roll_pitch * QUADCOPTER_MAX_TILT_ANGLE * 2;
+double YAW_CONTROL_SIGNAL_LIMIT = pid.KP_yaw * QUADCOPTER_MAX_YAW_ANGLE_CHANGE_PER_SECOND;
 
 double roll_pid_i, roll_last_error, pitch_pid_i, pitch_last_error, yaw_pid_i, yaw_last_error;
 double roll_control_signal, pitch_control_signal, yaw_control_signal;
 
 void InitializePIDConstants(){
-  pid.KP_roll_pitch = 0.28;
-  pid.KI_roll_pitch = 0.48;
-  pid.KD_roll_pitch = 0.20;
+  pid.KP_roll_pitch = 0.56;
+  pid.KI_roll_pitch = 0.96;
+  pid.KD_roll_pitch = 0.72;
 
-  pid.KP_yaw = 0.05;
-  pid.KI_yaw = 0.06;
-  pid.KD_yaw = 0.01;
+  pid.KP_yaw = 0.001;
+  pid.KI_yaw = 0.003;
+  pid.KD_yaw = 0.001;
 
   ROLL_PITCH_CONTROL_SIGNAL_LIMIT = pid.KP_roll_pitch * QUADCOPTER_MAX_TILT_ANGLE * 2;
+  YAW_CONTROL_SIGNAL_LIMIT = pid.KP_yaw * QUADCOPTER_MAX_YAW_ANGLE_CHANGE_PER_SECOND;
   }
 
 struct MotorPowers calculateMotorPowers(struct ReceiverCommands receiverCommands, struct IMU_Values imu_values) {
+
+  
   // calculate orientation errors (error: difference between desired orientation and actual orientation)
   double rollError = receiverCommands.RollAngle - imu_values.CurrentOrientation.RollAngle;
   double pitchError = receiverCommands.PitchAngle - imu_values.CurrentOrientation.PitchAngle;
@@ -41,6 +45,7 @@ struct MotorPowers calculateMotorPowers(struct ReceiverCommands receiverCommands
   // limit roll-pitch control signals
   roll_control_signal = constrain(roll_control_signal, -ROLL_PITCH_CONTROL_SIGNAL_LIMIT, ROLL_PITCH_CONTROL_SIGNAL_LIMIT);
   pitch_control_signal = constrain(pitch_control_signal, -ROLL_PITCH_CONTROL_SIGNAL_LIMIT, ROLL_PITCH_CONTROL_SIGNAL_LIMIT);
+  yaw_control_signal = constrain(yaw_control_signal, -QUADCOPTER_MAX_YAW_ANGLE_CHANGE_PER_SECOND, QUADCOPTER_MAX_YAW_ANGLE_CHANGE_PER_SECOND);
 
   // calculate power for each motor
   struct MotorPowers motorPowers;
@@ -50,6 +55,13 @@ struct MotorPowers calculateMotorPowers(struct ReceiverCommands receiverCommands
   motorPowers.rearRightMotorPower = round(receiverCommands.Throttle - roll_control_signal + pitch_control_signal - yaw_control_signal);
 
   motorPowers = reduceMotorPowers(motorPowers);
+
+  if(!receiverCommands.Armed){
+    motorPowers.frontLeftMotorPower = 0;
+  motorPowers.frontRightMotorPower = 0;
+  motorPowers.rearLeftMotorPower = 0;
+  motorPowers.rearRightMotorPower = 0;
+    }
 
   return motorPowers;
 }

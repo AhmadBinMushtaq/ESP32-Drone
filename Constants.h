@@ -6,8 +6,8 @@
 //----------- PINS -----------
 #define FRONT_LEFT_MOTOR_PIN 13
 #define FRONT_RIGHT_MOTOR_PIN 12
-#define REAR_LEFT_MOTOR_PIN 14
-#define REAR_RIGHT_MOTOR_PIN 27
+#define REAR_LEFT_MOTOR_PIN 27
+#define REAR_RIGHT_MOTOR_PIN 14
 #define LED_PIN 4
 #define BUZZER_PIN 15
 #define IMU_INTERRUPT_PIN 19

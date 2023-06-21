@@ -23,33 +23,53 @@ struct IMU_Values imu_values;
 
 //Task 1 pinned to core0. Mainly for communication interrupts of reciever and speedometer.
 void Task1code( void * pvParameters ){
-  initializeIMU();
-  initializeReceiver();
-  initializeMotors();
-  initializeOutputSignals();
+
+  
 
   for(;;){
-    syncOutputSignals();
 
-    commands = GetReceiverCommands();
-  tunePID(commands);
+//  tunePID(commands);
 //
   struct ConstantsPID pid = getPIDValues();
 
-  Serial2.print(commands.PitchAngle);
-  Serial2.print(",");
-  Serial2.print(imu_values.CurrentOrientation.PitchAngle);
-  Serial2.print(",");
+//  Serial2.print(commands.PitchAngle);
+//  Serial2.print(",");
+//  Serial2.print(imu_values.CurrentOrientation.PitchAngle);
+//  Serial2.print(",");
+//
+////  Serial.print("Roll, Pitch values: P: ");
+//  Serial2.print(pid.KP_roll_pitch);
+//  Serial2.print(",");
+////  Serial.print("I: ");
+//  Serial2.print(pid.KI_roll_pitch);
+//  Serial2.print(",");
+////  Serial.print("D: ");
+//  Serial2.println(pid.KD_roll_pitch);
 
-//  Serial.print("Roll, Pitch values: P: ");
-  Serial2.print(pid.KP_roll_pitch);
-  Serial2.print(",");
-//  Serial.print("I: ");
-  Serial2.print(pid.KI_roll_pitch);
-  Serial2.print(",");
-//  Serial.print("D: ");
-  Serial2.println(pid.KD_roll_pitch);
-    delay(20);
+//    //  Serial.print("Roll: ");
+//  Serial.print(commands.RollAngle);
+//  Serial.print(",");
+////  Serial.print("Pitch: ");
+//  Serial.print(commands.PitchAngle);
+//  Serial.print(",");
+////  Serial.print("Throttle: ");
+//  Serial.print(commands.Throttle);
+//  Serial.print(",");
+////  Serial.print("del_Yaw: ");
+//  Serial.print(commands.YawAngleChange);
+//  Serial.print(",");
+////  Serial.print("Aux 1: ");
+//  Serial.print(commands.Aux_1);
+//  Serial.print(",");
+////  Serial.print("Aux 2: ");
+//  Serial.print(commands.Aux_2);
+//  Serial.print(",");
+////  Serial.print("Error: ");
+//  Serial.print(commands.Error);
+//  Serial.print(",");
+////  Serial.print("Armed: ");
+//  Serial.println(commands.Armed);
+    delay(50);
 
 ////  Serial.print("Pitch: ");
 //  Serial.print(imu_values.CurrentOrientation.PitchAngle);
@@ -74,54 +94,43 @@ void Task1code( void * pvParameters ){
 
 //Task2code pinned to core1. Mainly for control loop and outputs.
 void Task2code( void * pvParameters ){
+    InitializePIDConstants();
 
-  InitializePIDConstants();
-  delay(1000);
+    initializeMotors();
+  initializeOutputSignals();
+
+    initializeIMU();
+  initializeReceiver();
+
   for(;;){
+    syncOutputSignals();
 
     imu_values = GetIMUvalues();
+        commands = GetReceiverCommands();
 
-//  //  Serial.print("Roll: ");
-//  Serial.print(commands.RollAngle);
-//  Serial.print("\t");
-////  Serial.print("Pitch: ");
-//  Serial.print(commands.PitchAngle);
-//  Serial.print("\t");
-////  Serial.print("Throttle: ");
-//  Serial.print(commands.Throttle);
-//  Serial.print("\t");
-////  Serial.print("del_Yaw: ");
-//  Serial.print(commands.YawAngleChange);
-//  Serial.print("\t");
-////  Serial.print("Aux 1: ");
-//  Serial.print(commands.Aux_1);
-//  Serial.print("\t");
-////  Serial.print("Aux 2: ");
-//  Serial.print(commands.Aux_2);
-//  Serial.print("\t");
-////  Serial.print("Error: ");
-//  Serial.print(commands.Error);
-//  Serial.print("\t");
-////  Serial.print("Armed: ");
-//  Serial.println(commands.Armed);
-
-
-
-
-  
 
   if (commands.Error || commands.Throttle < THROTTLE_START_POINT || !commands.Armed || imu_values.Error)
   {
+//    Serial.println("Motors not moving");
     stopMotors();
     resetPidVariables();
   }
 
-  if (imu_values.NewDataAvailable) {
+  else if (imu_values.NewDataAvailable) {
     struct MotorPowers motorPowers = calculateMotorPowers(commands, imu_values);
     spinMotors(motorPowers);
+//    Serial.println("Motors moving!!!");
+//      struct MotorPowers motorPowers;
+//      motorPowers.frontLeftMotorPower = commands.Throttle;
+//      motorPowers.frontRightMotorPower = commands.Throttle;
+//      motorPowers.rearLeftMotorPower = commands.Throttle;
+//      motorPowers.rearRightMotorPower = commands.Throttle;
+//
+//      spinMotors(motorPowers);
   }
 
   }
+  delay(1);
 }
 
 void setup() {

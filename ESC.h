@@ -10,7 +10,7 @@ class ESC
     // percentages).  Values chosen for Arduino compatibility.  These values
     // are part of the public API; DO NOT CHANGE THEM.
     static const int MIN_SPEED = 0;
-    static const int MAX_SPEED = 100;
+    static const int MAX_SPEED = 180;
 
     static const int MIN_PULSE_WIDTH = 1000;        // the shortest pulse sent to an esc
     static const int MAX_PULSE_WIDTH = 2000;        // the longest pulse sent to an esc
